@@ -8,12 +8,12 @@ import { FONTS } from "../../styles/fontt";
 import Buttons from "../../components/buttons/Buttons";
 import { useNavigation } from "@react-navigation/native";
 
-const AdminLogin = () => {
-
+const UserSignUp = () => {
   const navigation = useNavigation();
 
   const [data, setData] = useState({
     name: "",
+    email: "",
     password: "",
   });
 
@@ -28,13 +28,19 @@ const AdminLogin = () => {
       imageStyle={styles.image}
     >
       <AppText style={styles.title}>Campus Notify</AppText>
-      <AppText style={styles.text}>Admin Sign in</AppText>
+      <AppText style={styles.text}>Student Sign Up</AppText>
       <View style={{ paddingTop: s(80) }}>
         <CustomField
           secure={false}
-          placeholder={"Enter Admin Id"}
+          placeholder={"Enter Student Id"}
           value={data.name}
           onChangeText={(text: string) => handleInput("name", text)}
+        />
+        <CustomField
+          secure={false}
+          placeholder={"Enter Student Email"}
+          value={data.email}
+          onChangeText={(text: string) => handleInput("email", text)}
         />
         <CustomField
           secure={true}
@@ -43,12 +49,15 @@ const AdminLogin = () => {
           onChangeText={(text: string) => handleInput("password", text)}
         />
       </View>
-      <Buttons title="Login" onPress={()=>{}}/>
-      <Buttons title="Sign Up" onPress={()=>navigation.navigate("AdminSignUp")}/>
+      <Buttons title="Create New Account" onPress={() => {}} />
+      <Buttons
+        title="Go To Sign In"
+        onPress={() => navigation.navigate("UserLogin")}
+      />
     </ImageBackground>
   );
 };
-export default AdminLogin;
+export default UserSignUp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,

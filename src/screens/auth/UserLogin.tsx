@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { s, vs } from "react-native-size-matters";
 import { ImageBackground, StyleSheet, Text, View } from "react-native";
-import CustomField from "../../components/CustomField";
-import ButtonLogin from "../../components/ButtonLogin";
+import CustomField from "../../components/inputs/CustomField";
+import { AppColors } from "../../styles/colors";
+import AppText from "../../components/texts/AppText";
+import Buttons from "../../components/buttons/Buttons";
+import { FONTS } from "../../styles/fontt";
+import { useNavigation } from "@react-navigation/native";
 
 const UserLogin = () => {
+  
+  const navigation = useNavigation();
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -16,16 +23,16 @@ const UserLogin = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/background-signinup.jpg")}
+      source={require("../../assets/images/background-signinup.jpg")}
       style={styles.container}
       imageStyle={styles.image}
     >
-      <Text style={styles.title}>Campus Notify</Text>
-      <Text style={styles.text}>Student Sign in</Text>
+      <AppText style={styles.title}>Campus Notify</AppText>
+      <AppText style={styles.text}>Student Sign in</AppText>
       <View style={{ paddingTop: s(80) }}>
         <CustomField
           secure={false}
-          placeholder={"Enter User Id"}
+          placeholder={"Enter Student Id"}
           value={data.email}
           onChangeText={(text: string) => handleInput("email", text)}
         />
@@ -36,7 +43,8 @@ const UserLogin = () => {
           onChangeText={(text: string) => handleInput("password", text)}
         />
       </View>
-      <ButtonLogin />
+      <Buttons title="Login" onPress={()=>{}}/>
+      <Buttons title="Sign Up" onPress={()=>navigation.navigate("UserSignUp")}/>
     </ImageBackground>
   );
 };
@@ -54,14 +62,15 @@ const styles = StyleSheet.create({
   },
   title: {
     paddingTop: s(100),
-    color: "#00BFFF",
+    color: AppColors.cyan,
     fontSize: s(40),
-    fontWeight: "900",
+    fontFamily: FONTS.Bold,
   },
   text: {
     paddingTop: s(10),
-    color: "#BB86FC",
+    color: AppColors.purple,
     fontSize: s(25),
     fontWeight: "700",
+    fontFamily: FONTS.Bold,
   },
 });
