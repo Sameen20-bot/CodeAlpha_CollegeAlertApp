@@ -43,7 +43,7 @@ const AdminLogin = () => {
           onChangeText={(text: string) => handleInput("password", text)}
         />
       </View>
-      <Buttons title="Login" onPress={()=>{}}/>
+      <Buttons title="Login" onPress={()=>{navigation.navigate("BottomTab")}}/>
       <Buttons title="Sign Up" onPress={()=>navigation.navigate("AdminSignUp")}/>
     </ImageBackground>
   );

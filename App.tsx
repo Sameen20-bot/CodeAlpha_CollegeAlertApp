@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
-import { AuthStack } from "./src/navigation/AuthStack";
+import { MainStack } from "./src/navigation/MainStack";
 
 export default function App() {
   const [fonts] = useFonts({
@@ -18,7 +18,7 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
         <NavigationContainer>
-          <AuthStack />
+          <MainStack />
         </NavigationContainer>
       </SafeAreaView>
     </SafeAreaProvider>
