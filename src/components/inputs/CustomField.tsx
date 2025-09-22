@@ -1,3 +1,4 @@
+import { FC } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +9,19 @@ import {
 } from "react-native";
 import { s, vs } from "react-native-size-matters";
 
-const CustomField = ({ placeholder, secure, value, onChangeText }) => {
+interface CustomFieldTypes {
+  placeholder: string;
+  secure?: boolean;
+  value: string;
+  onChangeText: (text: string) => void;
+}
+
+const CustomField: FC<CustomFieldTypes> = ({
+  placeholder,
+  secure,
+  value,
+  onChangeText,
+}) => {
   return (
     <TouchableOpacity style={styles.container}>
       <TextInput

@@ -1,5 +1,6 @@
 import {
   ImageBackground,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,8 +14,12 @@ import { FONTS } from "../../styles/fontt";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable } from "react-native-gesture-handler";
 import AddButton from "../../components/buttons/AddButton";
+import { useState } from "react";
+import EventAdd from "./EventAdd";
 
 const EventScreen = () => {
+  const [visible, setVisible] = useState(false);
+
   return (
     <ImageBackground
       source={require("../../assets/images/background-signinup.jpg")}
@@ -64,8 +69,15 @@ const EventScreen = () => {
       </Shadow>
       {/* Add Button */}
       <View style={styles.addContainer}>
-        <AddButton onPress={() => {}}/>
+        <AddButton
+          onPress={() => {
+            setVisible(true);
+          }}
+        />
       </View>
+      <Modal visible={visible}>
+        <EventAdd onPressClose={() => setVisible(false)} />
+      </Modal>
     </ImageBackground>
   );
 };
@@ -164,5 +176,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  
 });
