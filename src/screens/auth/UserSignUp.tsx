@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import { Alert, ImageBackground, StyleSheet, Text, View } from "react-native";
 import { s, vs } from "react-native-size-matters";
 import CustomField from "../../components/inputs/CustomField";
 import { AppColors } from "../../styles/colors";
@@ -11,6 +11,10 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import CustomFieldControl from "../../components/inputs/CustomFieldControl";
+import { auth, db } from "../../configs/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { showMessage } from "react-native-flash-message";
+import { doc, setDoc } from "firebase/firestore";
 
 const UserSignUp = () => {
   const navigation = useNavigation();
@@ -40,8 +44,41 @@ const UserSignUp = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSignUp = () => {
-    navigation.navigate("BottomTab2");
+  const onSignUp = async (data: data) => {
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        data.Email,
+        data.Password
+      );
+
+      // Save role in firestore
+
+      const uid = userCredentials.user.uid;
+      await setDoc(doc(db, "users", uid), {
+        email: data.Email,
+        role: "student",
+        id: data.ID,
+      });
+      Alert.alert("User account created.");
+      navigation.navigate("BottomTab2");
+      return userCredentials.user;
+    } catch (error: any) {
+      let errorMessage = "";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already in use.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "The email address is invalid.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "The password is too weak.";
+      } else {
+        errorMessage = "An error occurred during sign-up.";
+      }
+      showMessage({
+        type: "danger",
+        message: errorMessage,
+      });
+    }
   };
 
   return (
@@ -69,12 +106,7 @@ const UserSignUp = () => {
           placeholder="Enter Password"
         />
       </View>
-      <Buttons
-        title="Create New Account"
-        onPress={
-          handleSubmit(onSignUp)
-        }
-      />
+      <Buttons title="Create New Account" onPress={handleSubmit(onSignUp)} />
       <Buttons
         title="Go To Sign In"
         onPress={() => navigation.navigate("UserLogin")}

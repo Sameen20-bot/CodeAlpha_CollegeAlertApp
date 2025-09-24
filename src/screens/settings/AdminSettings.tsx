@@ -28,14 +28,11 @@ const AdminSettings = () => {
 
         {/* Card with Options */}
         <View style={styles.card}>
-          {/* Profile Update */}
-          <TouchableOpacity style={styles.option}>
-            <AntDesign name="user" size={22} color={AppColors.cyan} />
-            <Text style={styles.optionText}>Update Profile</Text>
-          </TouchableOpacity>
-
           {/* Privacy Policy */}
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => navigation.navigate("PrivacyPolicy")}
+          >
             <MaterialIcons
               name="privacy-tip"
               size={22}
@@ -47,7 +44,7 @@ const AdminSettings = () => {
           {/* Logout */}
           <TouchableOpacity
             style={[styles.option, styles.logout]}
-            onPress={() => navigation.replace("AdminLogin")}
+            onPress={() => navigation.replace("UserOrAdmin")}
           >
             <AntDesign name="logout" size={22} color={AppColors.red} />
             <Text style={[styles.optionText, { color: AppColors.red }]}>

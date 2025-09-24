@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import { Alert, ImageBackground, StyleSheet, Text, View } from "react-native";
 import { s, vs } from "react-native-size-matters";
 import CustomField from "../../components/inputs/CustomField";
 import { AppColors } from "../../styles/colors";
@@ -10,6 +10,10 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import CustomFieldControl from "../../components/inputs/CustomFieldControl";
+import { showMessage } from "react-native-flash-message";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../configs/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const AdminSignUp = () => {
   const navigation = useNavigation();
@@ -39,8 +43,42 @@ const AdminSignUp = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSignUp = () => {
-    navigation.navigate("BottomTab");
+  const onSignUp = async (data: data) => {
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        data.Email,
+        data.Password
+      );
+
+      // Save role in firestore
+
+      const uid = userCredentials.user.uid;
+      await setDoc(doc(db, "users1", uid), {
+        email: data.Email,
+        role: "admin",
+        id: data.ID,
+      });
+      Alert.alert("User account created.");
+
+      navigation.navigate("BottomTab");
+      return userCredentials.user;
+    } catch (error: any) {
+      let errorMessage = "";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already in use.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "The email address is invalid.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "The password is too weak.";
+      } else {
+        errorMessage = "An error occurred during sign-up.";
+      }
+      showMessage({
+        type: "danger",
+        message: errorMessage,
+      });
+    }
   };
 
   return (

@@ -20,51 +20,44 @@ import CustomFieldControl from "../../components/inputs/CustomFieldControl";
 import { useDispatch } from "react-redux";
 import { addItemToEvent } from "../../store/reducers/EventSlice";
 
+// Props
 interface EventAddProps {
+  onSubmit: (event: {
+    id: number;
+    title: string;
+    detail: string;
+    tag: string;
+    date: string;
+  }) => void;
   onPressClose: () => void;
 }
 
-interface EventData {
-  title: string;
-  author: string;
-  price: string;
-  image: string;
-  tag: string | null;
-  date?: string;
-}
+// Validation schema
+const schema = yup
+  .object({
+    Title: yup.string().required("*Title is required."),
+    Details: yup.string().required("*Details is required."),
+    Tag: yup.string().required("*Tag is required."),
+    Date: yup.string().required("*Date is required."),
+  })
+  .required();
 
-const EventAdd: React.FC<EventAddProps> = ({ onPressClose }) => {
-  const dispatch = useDispatch();
+type FormData = yup.InferType<typeof schema>;
 
-  const schema = yup
-    .object({
-      Title: yup.string().required("*Title is required."),
-
-      Details: yup.string().required("*Details is required."),
-
-      Tag: yup.string().required("*Tag is required."),
-
-      Date: yup.string().required("*Date is required."),
-    })
-    .required();
-
-  type data = yup.InferType<typeof schema>;
-
-  const { control, handleSubmit } = useForm({
+const EventAdd: React.FC<EventAddProps> = ({ onSubmit, onPressClose }) => {
+  const { control, handleSubmit } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: data) => {
-    dispatch(
-      addItemToEvent({
-        id: Date.now(),
-        title: data.Title,
-        details: data.Details,
-        tag: data.Tag,
-        date: data.Date,
-      })
-    );
-    onPressClose();
+  const handleFormSubmit = (data: FormData) => {
+    const newEvent = {
+      id: Date.now(),
+      title: data.Title,
+      detail: data.Details,
+      tag: data.Tag,
+      date: data.Date,
+    };
+    onSubmit(newEvent); // send to parent
   };
 
   return (
@@ -110,7 +103,7 @@ const EventAdd: React.FC<EventAddProps> = ({ onPressClose }) => {
 
           {/* Upload Button */}
           <View style={{ marginTop: vs(25) }}>
-            <Buttons title="Upload" onPress={handleSubmit(onSubmit)} />
+            <Buttons title="Upload" onPress={handleSubmit(handleFormSubmit)} />
           </View>
         </View>
       </ScrollView>
@@ -121,13 +114,8 @@ const EventAdd: React.FC<EventAddProps> = ({ onPressClose }) => {
 export default EventAdd;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  image: {
-    height: "100%",
-    width: "100%",
-  },
+  container: { flex: 1 },
+  image: { height: "100%", width: "100%" },
   innerContainer: {
     backgroundColor: AppColors.black + "75",
     borderRadius: s(20),

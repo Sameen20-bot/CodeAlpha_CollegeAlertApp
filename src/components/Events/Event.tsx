@@ -12,10 +12,18 @@ interface EventTypes {
   detail: string;
   tag: string;
   date: string | number;
-  onDelete: () => void;
+  onDelete?: () => void;
+  isAdmin: boolean;
 }
 
-const Event: FC<EventTypes> = ({ title, detail, tag, date, onDelete }) => {
+const Event: FC<EventTypes> = ({
+  title,
+  detail,
+  tag,
+  date,
+  onDelete,
+  isAdmin,
+}) => {
   const [visible, setVisible] = useState(false);
 
   const handleOpen = () => setVisible(true);
@@ -23,7 +31,6 @@ const Event: FC<EventTypes> = ({ title, detail, tag, date, onDelete }) => {
 
   return (
     <>
-      {/* Event Card */}
       <Shadow
         distance={12}
         startColor={AppColors.cyan}
@@ -31,6 +38,7 @@ const Event: FC<EventTypes> = ({ title, detail, tag, date, onDelete }) => {
           flexDirection: "row",
           width: "90%",
           alignSelf: "center",
+          marginBottom: s(30),
         }}
       >
         <TouchableOpacity
@@ -38,7 +46,6 @@ const Event: FC<EventTypes> = ({ title, detail, tag, date, onDelete }) => {
           activeOpacity={0.9}
           onPress={handleOpen}
         >
-          {/* Details Container */}
           <View style={styles.detailContainer}>
             <View style={styles.detailHead}>
               <AppText style={styles.title}>{title}</AppText>
@@ -52,20 +59,21 @@ const Event: FC<EventTypes> = ({ title, detail, tag, date, onDelete }) => {
             <AppText style={styles.date}>📅 {date}</AppText>
           </View>
 
-          {/* Delete Container */}
-          <View style={styles.deleteContainer}>
-            <TouchableOpacity style={styles.dltButton} onPress={onDelete}>
-              <MaterialCommunityIcons
-                name="delete"
-                size={24}
-                color={AppColors.red}
-              />
-            </TouchableOpacity>
-          </View>
+          {/* ✅ Show delete only if isAdmin=true */}
+          {isAdmin && (
+            <View style={styles.deleteContainer}>
+              <TouchableOpacity style={styles.dltButton} onPress={onDelete}>
+                <MaterialCommunityIcons
+                  name="delete"
+                  size={24}
+                  color={AppColors.red}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </TouchableOpacity>
       </Shadow>
 
-      {/* Modal */}
       <Modal
         animationType="slide"
         transparent
@@ -104,29 +112,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(12),
     backgroundColor: AppColors.black + "90",
   },
-  detailContainer: {
-    flex: 0.8,
-    marginRight: s(8),
-  },
-  detailHead: {
-    flexDirection: "row",
-  },
+  detailContainer: { flex: 0.8, marginRight: s(8) },
+  detailHead: { flexDirection: "row" },
   tag: {
     backgroundColor: AppColors.cyan + "75",
     borderRadius: s(10),
     borderColor: AppColors.cyan,
     borderWidth: 1,
     marginLeft: s(10),
-    // width: s(50),
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: s(3),
     paddingVertical: s(1),
   },
-  tagText: {
-    color: AppColors.cyan,
-    fontFamily: FONTS.Medium,
-  },
+  tagText: { color: AppColors.cyan, fontFamily: FONTS.Medium },
   deleteContainer: {
     width: s(40),
     alignItems: "center",
@@ -143,16 +142,8 @@ const styles = StyleSheet.create({
     borderColor: AppColors.red,
     borderWidth: 1,
   },
-  title: {
-    fontFamily: FONTS.Bold,
-    color: AppColors.white,
-    fontSize: s(15),
-  },
-  text: {
-    fontFamily: FONTS.Medium,
-    color: AppColors.white,
-    fontSize: s(14),
-  },
+  title: { fontFamily: FONTS.Bold, color: AppColors.white, fontSize: s(15) },
+  text: { fontFamily: FONTS.Medium, color: AppColors.white, fontSize: s(14) },
   date: {
     marginTop: s(5),
     fontFamily: FONTS.Medium,

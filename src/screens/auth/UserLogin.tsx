@@ -10,16 +10,24 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import CustomFieldControl from "../../components/inputs/CustomFieldControl";
+import { auth, db } from "../../configs/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { showMessage } from "react-native-flash-message";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../../store/reducers/UserSlice";
 
 const UserLogin = () => {
   const navigation = useNavigation();
 
+  const dispatch = useDispatch();
+
   const schema = yup
     .object({
-      ID: yup
+      Email: yup
         .string()
-        .required("*Student Id is required.")
-        .min(4, "Student Id must be atleast 4 characters."),
+        .email("Please enter a valid email.")
+        .required("*Email Id is required."),
 
       Password: yup
         .string()
@@ -34,8 +42,48 @@ const UserLogin = () => {
     resolver: yupResolver(schema),
   });
 
-  const onLogIn = () => {
-    navigation.navigate("BottomTab2");
+  const onLogIn = async (data: FormData) => {
+    try {
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        data.Email,
+        data.Password
+      );
+
+      const uid = userCredentials.user.uid;
+      const userDoc = await getDoc(doc(db, "users", uid));
+
+      const role = userDoc.data().role;
+
+      if (role !== "student") {
+        showMessage({
+          type: "danger",
+          message: "Only students can log in here",
+        });
+        return;
+      }
+
+      navigation.navigate("BottomTab2");
+
+      const userDataObj = {
+        uid: userCredentials.user.uid,
+      };
+      dispatch(setUserData(userDataObj));
+    } catch (error: any) {
+      let errorMessage = "";
+      console.log(error.code);
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "User not found";
+      } else if (error.code === "auth/invalid-credential") {
+        errorMessage = "Wrong email or password";
+      } else {
+        errorMessage = "An error occurred during sign-in";
+      }
+      showMessage({
+        type: "danger",
+        message: errorMessage,
+      });
+    }
   };
 
   return (
@@ -48,14 +96,15 @@ const UserLogin = () => {
       <AppText style={styles.text}>Student Sign in</AppText>
       <View style={{ paddingTop: s(80) }}>
         <CustomFieldControl
-          name="ID"
+          name="Email"
           control={control}
-          placeholder="Enter Student Id"
+          placeholder="Enter Email"
         />
         <CustomFieldControl
           name="Password"
           control={control}
           placeholder="Enter Password"
+          secureTextEntry={true}
         />
       </View>
       <Buttons title="Login" onPress={handleSubmit(onLogIn)} />

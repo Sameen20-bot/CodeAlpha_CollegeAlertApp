@@ -1,23 +1,73 @@
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { s, vs } from "react-native-size-matters";
+import React, { useEffect } from "react";
+import { ImageBackground, StyleSheet, View, FlatList } from "react-native";
+import { s } from "react-native-size-matters";
+import { useSelector, useDispatch } from "react-redux";
 import { AppColors } from "../../styles/colors";
-import { Shadow } from "react-native-shadow-2";
 import AppText from "../../components/texts/AppText";
 import { FONTS } from "../../styles/fontt";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { FlatList, Pressable } from "react-native-gesture-handler";
-import { useState } from "react";
+import { Feather } from "@expo/vector-icons";
 import Event from "../../components/Events/Event";
-import { events } from "../../data/events";
+import AddButton from "../../components/buttons/AddButton";
+import FlashMessage, { showMessage } from "react-native-flash-message";
+import {
+  addItemToEvent,
+  deleteItem,
+  setEvents,
+} from "../../store/reducers/EventSlice";
+import { RootState } from "../../store/Store";
+import { collection, getDocs } from "firebase/firestore";
 
 const EventDisplay = () => {
-  const [visible, setVisible] = useState(false);
+  const dispatch = useDispatch();
+
+  const events = useSelector((state: RootState) => state.EventSlice.items);
+
+  // Add new event
+  const handleAddEvent = (newEvent: any) => {
+    dispatch(addItemToEvent(newEvent));
+
+    showMessage({
+      message: "New Event Added!",
+      description: newEvent.title,
+      type: "success",
+      duration: 3000,
+    });
+  };
+
+  // Delete event
+  const handleDelete = (id: number | string) => {
+    dispatch(deleteItem(id));
+
+    showMessage({
+      message: "Event Deleted",
+      type: "danger",
+      duration: 3000,
+    });
+  };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "events"));
+        const firestoreEvents = [];
+        querySnapshot.forEach((docSnap) => {
+          firestoreEvents.push({
+            id: docSnap.id,
+            ...docSnap.data(),
+          });
+        });
+        dispatch(setEvents(firestoreEvents));
+      } catch (err) {
+        console.log(err);
+        showMessage({
+          message: "Failed to fetch events",
+          type: "danger",
+          duration: 3000,
+        });
+      }
+    };
+    fetchEvents();
+  }, []);
 
   return (
     <ImageBackground
@@ -25,24 +75,41 @@ const EventDisplay = () => {
       style={styles.container}
       imageStyle={styles.image}
     >
-      {/* Title Container */}
       <View style={styles.titleContainer}>
         <Feather name="list" size={30} color={AppColors.cyan} />
         <AppText style={styles.headTitle}>Events</AppText>
       </View>
+
       <FlatList
         data={events}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Event
             title={item.title}
-            detail={item.description}
-            tag={item.category}
+            detail={item.detail}
+            tag={item.tag}
             date={item.date}
+            isAdmin={false}
           />
         )}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* Floating AddButton */}
+      <AddButton
+        onPress={() =>
+          handleAddEvent({
+            id: Date.now(),
+            title: "New Event by Admin",
+            detail: "Details come from admin input or form",
+            tag: "General",
+            date: "2025-09-30",
+          })
+        }
+        style={{ position: "absolute", bottom: 30, right: 30 }}
+      />
+
+      <FlashMessage position="top" />
     </ImageBackground>
   );
 };
@@ -50,20 +117,14 @@ const EventDisplay = () => {
 export default EventDisplay;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  image: {
-    height: "100%",
-    width: "100%",
-  },
+  container: { flex: 1 },
+  image: { height: "100%", width: "100%" },
   titleContainer: {
     marginTop: s(30),
     marginStart: s(20),
     marginBottom: s(30),
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
   },
   headTitle: {
     color: AppColors.white,

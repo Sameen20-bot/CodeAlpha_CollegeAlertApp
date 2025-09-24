@@ -41,20 +41,4 @@ export const events = [
     description:
       "Showcase of creative design projects from students and professionals, covering UI/UX, graphics, and product design.",
   },
-  {
-    id: 6,
-    title: "Cybersecurity Summit",
-    date: "2026-02-18",
-    category: "Seminar",
-    description:
-      "A global summit discussing the latest trends, threats, and solutions in cybersecurity.",
-  },
-  {
-    id: 7,
-    title: "Robotics Fair",
-    date: "2026-03-25",
-    category: "Exhibition",
-    description:
-      "An exhibition featuring innovative robotics projects, from humanoid bots to industrial automation.",
-  },
 ];
