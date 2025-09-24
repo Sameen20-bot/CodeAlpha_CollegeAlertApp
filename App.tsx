@@ -3,6 +3,9 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { MainStack } from "./src/navigation/MainStack";
+import { store } from "./src/store/Store";
+import { Provider } from "react-redux";
+
 
 export default function App() {
   const [fonts] = useFonts({
@@ -17,9 +20,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
-        <NavigationContainer>
-          <MainStack />
-        </NavigationContainer>
+        <Provider store={store}>
+          <NavigationContainer>
+            <MainStack />
+          </NavigationContainer>
+        </Provider>
       </SafeAreaView>
     </SafeAreaProvider>
   );

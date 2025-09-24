@@ -13,6 +13,12 @@ import CustomField from "../../components/inputs/CustomField";
 import { AppColors } from "../../styles/colors";
 import { FONTS } from "../../styles/fontt";
 import Buttons from "../../components/buttons/Buttons";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import CustomFieldControl from "../../components/inputs/CustomFieldControl";
+import { useDispatch } from "react-redux";
+import { addItemToEvent } from "../../store/reducers/EventSlice";
 
 interface EventAddProps {
   onPressClose: () => void;
@@ -28,17 +34,37 @@ interface EventData {
 }
 
 const EventAdd: React.FC<EventAddProps> = ({ onPressClose }) => {
-  const [data, setData] = useState<EventData>({
-    title: "",
-    author: "",
-    price: "",
-    image: "",
-    tag: null,
-    date: "",
+  const dispatch = useDispatch();
+
+  const schema = yup
+    .object({
+      Title: yup.string().required("*Title is required."),
+
+      Details: yup.string().required("*Details is required."),
+
+      Tag: yup.string().required("*Tag is required."),
+
+      Date: yup.string().required("*Date is required."),
+    })
+    .required();
+
+  type data = yup.InferType<typeof schema>;
+
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const handleInput = (name: keyof EventData, value: string | null) => {
-    setData((prev) => ({ ...prev, [name]: value }));
+  const onSubmit = (data: data) => {
+    dispatch(
+      addItemToEvent({
+        id: Date.now(),
+        title: data.Title,
+        details: data.Details,
+        tag: data.Tag,
+        date: data.Date,
+      })
+    );
+    onPressClose();
   };
 
   return (
@@ -61,30 +87,30 @@ const EventAdd: React.FC<EventAddProps> = ({ onPressClose }) => {
           <Text style={styles.title}>Event Details</Text>
 
           {/* Input Fields */}
-          <CustomField
+          <CustomFieldControl
+            name="Title"
+            control={control}
             placeholder="Enter Event Title"
-            value={data.title}
-            onChangeText={(text) => handleInput("title", text)}
           />
-          <CustomField
-            placeholder="Enter The Details"
-            value={data.author}
-            onChangeText={(text) => handleInput("author", text)}
+          <CustomFieldControl
+            name="Details"
+            control={control}
+            placeholder="Enter Details"
           />
-          <CustomField
-            placeholder="Enter The Tag"
-            value={data.tag || ""}
-            onChangeText={(text) => handleInput("tag", text)}
+          <CustomFieldControl
+            name="Tag"
+            control={control}
+            placeholder="Enter Tag"
           />
-          <CustomField
-            placeholder="Enter The Date"
-            value={data.date || ""}
-            onChangeText={(text) => handleInput("date", text)}
+          <CustomFieldControl
+            name="Date"
+            control={control}
+            placeholder="Enter Date"
           />
 
           {/* Upload Button */}
           <View style={{ marginTop: vs(25) }}>
-            <Buttons title="Upload" onPress={onPressClose}/>
+            <Buttons title="Upload" onPress={handleSubmit(onSubmit)} />
           </View>
         </View>
       </ScrollView>

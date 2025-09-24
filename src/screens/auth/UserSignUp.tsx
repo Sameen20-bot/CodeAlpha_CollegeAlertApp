@@ -7,18 +7,41 @@ import AppText from "../../components/texts/AppText";
 import { FONTS } from "../../styles/fontt";
 import Buttons from "../../components/buttons/Buttons";
 import { useNavigation } from "@react-navigation/native";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import CustomFieldControl from "../../components/inputs/CustomFieldControl";
 
 const UserSignUp = () => {
   const navigation = useNavigation();
 
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    password: "",
+  const schema = yup
+    .object({
+      ID: yup
+        .string()
+        .required("*Student Id is required.")
+        .min(4, "Student Id must be atleast 4 characters."),
+
+      Email: yup
+        .string()
+        .email("Please enter a valid email")
+        .required("*Email is required."),
+
+      Password: yup
+        .string()
+        .required("*Password is required.")
+        .min(6, "Password must be atleast 6 characters."),
+    })
+    .required();
+
+  type data = yup.InferType<typeof schema>;
+
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const handleInput = (names: string, values: any) => {
-    setData({ ...data, [names]: values });
+  const onSignUp = () => {
+    navigation.navigate("BottomTab2");
   };
 
   return (
@@ -29,27 +52,29 @@ const UserSignUp = () => {
     >
       <AppText style={styles.title}>Campus Notify</AppText>
       <AppText style={styles.text}>Student Sign Up</AppText>
-      <View style={{ paddingTop: s(80) }}>
-        <CustomField
-          secure={false}
-          placeholder={"Enter Student Id"}
-          value={data.name}
-          onChangeText={(text: string) => handleInput("name", text)}
+      <View style={{ paddingTop: s(40) }}>
+        <CustomFieldControl
+          name="ID"
+          control={control}
+          placeholder="Enter Student Id"
         />
-        <CustomField
-          secure={false}
-          placeholder={"Enter Student Email"}
-          value={data.email}
-          onChangeText={(text: string) => handleInput("email", text)}
+        <CustomFieldControl
+          name="Email"
+          control={control}
+          placeholder="Enter Email"
         />
-        <CustomField
-          secure={true}
-          placeholder={"Enter Password"}
-          value={data.password}
-          onChangeText={(text: string) => handleInput("password", text)}
+        <CustomFieldControl
+          name="Password"
+          control={control}
+          placeholder="Enter Password"
         />
       </View>
-      <Buttons title="Create New Account" onPress={() => {}} />
+      <Buttons
+        title="Create New Account"
+        onPress={
+          handleSubmit(onSignUp)
+        }
+      />
       <Buttons
         title="Go To Sign In"
         onPress={() => navigation.navigate("UserLogin")}

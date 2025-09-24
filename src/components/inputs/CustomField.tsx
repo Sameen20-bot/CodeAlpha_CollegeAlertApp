@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   Touchable,
   TouchableOpacity,
   View,
@@ -13,7 +14,9 @@ interface CustomFieldTypes {
   placeholder: string;
   secure?: boolean;
   value: string;
+  keyboardType?: "default" | "numeric" | "email-address";
   onChangeText: (text: string) => void;
+  style?: TextStyle;
 }
 
 const CustomField: FC<CustomFieldTypes> = ({
@@ -21,6 +24,8 @@ const CustomField: FC<CustomFieldTypes> = ({
   secure,
   value,
   onChangeText,
+  keyboardType,
+  style,
 }) => {
   return (
     <TouchableOpacity style={styles.container}>
@@ -30,7 +35,8 @@ const CustomField: FC<CustomFieldTypes> = ({
         secureTextEntry={secure}
         value={value}
         onChangeText={onChangeText}
-        style={styles.textInput}
+        style={[styles.textInput, style]}
+        keyboardType={keyboardType}
       />
     </TouchableOpacity>
   );

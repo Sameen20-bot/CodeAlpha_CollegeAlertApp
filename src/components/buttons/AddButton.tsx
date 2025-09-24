@@ -18,14 +18,7 @@ interface AddButtonTypes {
 
 const AddButton: FC<AddButtonTypes> = ({ onPress, style }) => {
   return (
-    <Shadow
-      distance={10}
-      startColor={AppColors.cyan}
-      containerStyle={{
-        position: "relative",
-        bottom: -430,
-      }}
-    >
+    <Shadow distance={10} startColor={AppColors.cyan}>
       <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
         <AntDesign name="plus" size={50} color={AppColors.bgBlue} />
       </TouchableOpacity>

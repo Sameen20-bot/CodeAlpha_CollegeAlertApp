@@ -13,9 +13,8 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-const AdminSettings = () => {
+const StudentSettings = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
-
   return (
     <ImageBackground
       source={require("../../assets/images/background-signinup.jpg")}
@@ -47,7 +46,7 @@ const AdminSettings = () => {
           {/* Logout */}
           <TouchableOpacity
             style={[styles.option, styles.logout]}
-            onPress={() => navigation.replace("AdminLogin")}
+            onPress={() => navigation.replace("UserLogin")}
           >
             <AntDesign name="logout" size={22} color={AppColors.red} />
             <Text style={[styles.optionText, { color: AppColors.red }]}>
@@ -60,7 +59,7 @@ const AdminSettings = () => {
   );
 };
 
-export default AdminSettings;
+export default StudentSettings;
 
 const styles = StyleSheet.create({
   container: {

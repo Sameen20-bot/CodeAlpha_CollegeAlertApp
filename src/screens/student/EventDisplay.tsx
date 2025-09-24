@@ -1,6 +1,5 @@
 import {
   ImageBackground,
-  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,20 +12,11 @@ import AppText from "../../components/texts/AppText";
 import { FONTS } from "../../styles/fontt";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlatList, Pressable } from "react-native-gesture-handler";
-import AddButton from "../../components/buttons/AddButton";
 import { useState } from "react";
-import EventAdd from "./EventAdd";
 import Event from "../../components/Events/Event";
 import { events } from "../../data/events";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/Store";
-import { deleteItem } from "../../store/reducers/EventSlice";
 
-const EventScreen = () => {
-  const { items } = useSelector((state: RootState) => state.EventSlice);
-
-  const dispatch = useDispatch();
-
+const EventDisplay = () => {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -38,38 +28,27 @@ const EventScreen = () => {
       {/* Title Container */}
       <View style={styles.titleContainer}>
         <Feather name="list" size={30} color={AppColors.cyan} />
-        <AppText style={styles.headTitle}>Manage Events</AppText>
+        <AppText style={styles.headTitle}>Events</AppText>
       </View>
       <FlatList
-        data={items}
+        data={events}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Event
             title={item.title}
-            detail={item.details}
-            tag={item.tag}
+            detail={item.description}
+            tag={item.category}
             date={item.date}
-            onDelete={() => dispatch(deleteItem(item.id))}
           />
         )}
         showsVerticalScrollIndicator={false}
       />
-      {/* Add Button */}
-      <View style={styles.addContainer}>
-        <AddButton
-          onPress={() => {
-            setVisible(true);
-          }}
-        />
-      </View>
-      <Modal visible={visible}>
-        <EventAdd onPressClose={() => setVisible(false)} />
-      </Modal>
     </ImageBackground>
   );
 };
 
-export default EventScreen;
+export default EventDisplay;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -91,10 +70,5 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.Bold,
     fontSize: s(22),
     marginStart: s(10),
-  },
-  addContainer: {
-    position: "absolute",
-    bottom: s(30),
-    alignSelf: "center",
   },
 });

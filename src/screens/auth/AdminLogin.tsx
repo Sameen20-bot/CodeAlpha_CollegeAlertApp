@@ -7,18 +7,36 @@ import AppText from "../../components/texts/AppText";
 import { FONTS } from "../../styles/fontt";
 import Buttons from "../../components/buttons/Buttons";
 import { useNavigation } from "@react-navigation/native";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import CustomFieldControl from "../../components/inputs/CustomFieldControl";
 
 const AdminLogin = () => {
-
   const navigation = useNavigation();
 
-  const [data, setData] = useState({
-    name: "",
-    password: "",
+  const schema = yup
+    .object({
+      ID: yup
+        .string()
+        .required("*Admin Id is required.")
+        .min(4, "Admin Id must be atleast 4 characters."),
+
+      Password: yup
+        .string()
+        .required("*Password is required.")
+        .min(6, "Password must be atleast 6 characters."),
+    })
+    .required();
+
+  type data = yup.InferType<typeof schema>;
+
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const handleInput = (names: string, values: any) => {
-    setData({ ...data, [names]: values });
+  const onLogIn = () => {
+    navigation.navigate("BottomTab");
   };
 
   return (
@@ -30,21 +48,22 @@ const AdminLogin = () => {
       <AppText style={styles.title}>Campus Notify</AppText>
       <AppText style={styles.text}>Admin Sign in</AppText>
       <View style={{ paddingTop: s(80) }}>
-        <CustomField
-          secure={false}
-          placeholder={"Enter Admin Id"}
-          value={data.name}
-          onChangeText={(text: string) => handleInput("name", text)}
+        <CustomFieldControl
+          name="ID"
+          control={control}
+          placeholder="Enter Admin Id"
         />
-        <CustomField
-          secure={true}
-          placeholder={"Enter Password"}
-          value={data.password}
-          onChangeText={(text: string) => handleInput("password", text)}
+        <CustomFieldControl
+          name="Password"
+          control={control}
+          placeholder="Enter Password"
         />
       </View>
-      <Buttons title="Login" onPress={()=>{navigation.navigate("BottomTab")}}/>
-      <Buttons title="Sign Up" onPress={()=>navigation.navigate("AdminSignUp")}/>
+      <Buttons title="Login" onPress={handleSubmit(onLogIn)} />
+      <Buttons
+        title="Sign Up"
+        onPress={() => navigation.navigate("AdminSignUp")}
+      />
     </ImageBackground>
   );
 };
